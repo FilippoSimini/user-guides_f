@@ -1,4 +1,4 @@
-name: Export All Commits
+name: Summarize Commits
 
 on:
   workflow_dispatch: # Allows you to run this manually from the Actions tab
@@ -19,6 +19,25 @@ jobs:
               git log --stat --pretty=format:"__|__$file||%H||%s||%an||%ae||%ar||%ad||%B" -- "$file" >> commit_history.txt
               echo "_/^\_" >> commit_history.txt
           done && [ -s commit_history.txt ] && sed -i '$d' commit_history.txt
+
+      - name: Map Emails to GitHub Usernames
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Username, Email" > email_username.txt
+          
+          # Get unique emails from the git log
+          emails=$(git log --format='%aE' | sort -u)
+
+          for email in $emails; do
+            # Find the first commit SHA associated with this email
+            commit_sha=$(git log --author="$email" -n 1 --format='%H')
+            
+            # Use GitHub CLI to fetch the username for that commit
+            username=$(gh api repos/${{ github.repository }}/commits/$commit_sha --jq '.author.login // "Unknown"')
+            
+            echo "$email, $username" >> email_username.txt
+          done
 
       - name: Install dependencies
         run: |
