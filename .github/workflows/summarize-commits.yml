@@ -11,12 +11,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Crucial: 0 fetches all history for all branches and tags
-
-      - name: Extract Commits to File
+      
+      - name: Extract Log for Each File
         run: |
-          # Format: Hash | Author Date | Author Name | Subject
-          #git log --pretty=format:"%H | %ad | %an | %s" --date=short > commit_history.txt
-          git log --pretty=format:"__|__%H||%s||%an||%ae||%ar||%ad||%B" > commit_history.txt
+          # Find all files (excluding the .git folder) and run git log on each
+          find . -type f -not -path '*/.*' | while read -r file; do
+              git log --stat --pretty=format:"__|__$file||%H||%s||%an||%ae||%ar||%ad||%B" -- "$file" >> commit_history.txt
+          done
           
       - name: Upload Commit File
         uses: actions/upload-artifact@v4
