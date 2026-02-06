@@ -18,10 +18,18 @@ jobs:
           find . -type f -not -path '*/.*' | while read -r file; do
               git log --stat --pretty=format:"__|__$file||%H||%s||%an||%ae||%ar||%ad||%B" -- "$file" >> commit_history.txt
               echo "_/^\_" >> commit_history.txt
-          done
+          done && [ -s commit_history.txt ] && sed -i '$d' commit_history.txt
+
+      - name: Process with Python
+        run: |
+          # Set PYTHONPATH to the current directory so imports work correctly
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          python3 scripts/summarize_commits.py
           
-      - name: Upload Commit File
+      - name: Upload Results
         uses: actions/upload-artifact@v4
         with:
           name: repository-commit-log
-          path: commit_history.txt
+          path: |
+            commit_history.txt
+            commits_summary.csv
