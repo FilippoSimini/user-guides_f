@@ -51,7 +51,7 @@ def process_file_commits(df_comm):
     df["author_w_most_edits_this_year"] = author_w_most_edits
 
     # system and page name
-    file_path = df_comm['file_path'].values[0].strip('./docs')
+    file_path = df_comm['file_path'].values[0].removeprefix('./docs/')
     df['system'] = file_path.split('/')[0]
     df['name'] = file_path.split('/')[-1]
     # add github url
