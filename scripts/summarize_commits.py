@@ -41,7 +41,7 @@ def process_file_commits(df_comm):
 
     # authors
     user_col = 'author_email'
-    top4_authors_w_most_edits = sort_authors_by_number_of_edits(df_comm, in_the_last_year=False, user_col=user_col)[:4]
+    top4_authors_w_most_edits = sort_authors_by_number_of_edits(df_comm, in_the_last_year=False, user_col=user_col)[:4].tolist()
     df["top4_authors_w_most_edits"] = [top4_authors_w_most_edits]
     df["author_w_most_edits"] = top4_authors_w_most_edits[0]
     try:
@@ -51,7 +51,7 @@ def process_file_commits(df_comm):
     df["author_w_most_edits_this_year"] = author_w_most_edits
 
     # system and page name
-    file_path = df_comm['file_path'].values[0]
+    file_path = df_comm['file_path'].values[0].strip('./docs')
     df['system'] = file_path.split('/')[0]
     df['name'] = file_path.split('/')[-1]
     # add github url
@@ -96,4 +96,3 @@ def main(commit_history_path, d='||', s='__|__', file_delim='_/^\_'):
 
 if __name__ == '__main__':
     main('commit_history.txt')
-
