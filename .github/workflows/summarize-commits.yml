@@ -24,20 +24,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Username, Email" > email_username.txt
+          echo "Username, Email" > authors.txt
           
-          # Get unique emails from the git log
-          emails=$(git log --format='%aE' | sort -u)
+          # Get unique emails, filtering out empty lines
+          emails=$(git log --format='%aE' | sort -u | grep -v '^$')
 
-          for email in $emails; do
-            # Find the first commit SHA associated with this email
+          while read -r email; do
+            # Find the latest commit SHA for this email
             commit_sha=$(git log --author="$email" -n 1 --format='%H')
             
-            # Use GitHub CLI to fetch the username for that commit
-            username=$(gh api repos/${{ github.repository }}/commits/$commit_sha --jq '.author.login // "Unknown"')
-            
-            echo "$email, $username" >> email_username.txt
-          done
+            if [ -n "$commit_sha" ]; then
+              # Fetch username, handling cases where the author might be null in the API
+              username=$(gh api repos/${{ github.repository }}/commits/$commit_sha --jq '.author.login // "Unknown"')
+              echo "$username, $email" >> authors.txt
+            fi
+          done <<< "$emails"
 
       - name: Install dependencies
         run: |
