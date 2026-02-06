@@ -1,0 +1,25 @@
+name: Export All Commits
+
+on:
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+
+jobs:
+  get-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Crucial: 0 fetches all history for all branches and tags
+
+      - name: Extract Commits to File
+        run: |
+          # Format: Hash | Author Date | Author Name | Subject
+          #git log --pretty=format:"%H | %ad | %an | %s" --date=short > commit_history.txt
+          git log --pretty=format:"__|__%H||%s||%an||%ae||%ar||%ad||%B" > commit_history.txt
+          
+      - name: Upload Commit File
+        uses: actions/artifacts@v4
+        with:
+          name: repository-commit-log
+          path: commit_history.txt
