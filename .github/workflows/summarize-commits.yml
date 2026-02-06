@@ -24,7 +24,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Username, Email" > authors.txt
+          echo "email,username" > email_username.csv
           
           # Get unique emails, filtering out empty lines
           emails=$(git log --format='%aE' | sort -u | grep -v '^$')
@@ -36,7 +36,7 @@ jobs:
             if [ -n "$commit_sha" ]; then
               # Fetch username, handling cases where the author might be null in the API
               username=$(gh api repos/${{ github.repository }}/commits/$commit_sha --jq '.author.login // "Unknown"')
-              echo "$username, $email" >> authors.txt
+              echo "$email,$username" >> email_username.csv
             fi
           done <<< "$emails"
 
@@ -58,3 +58,4 @@ jobs:
           path: |
             commit_history.txt
             commits_summary.csv
+            email_username.csv
