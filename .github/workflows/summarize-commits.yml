@@ -15,7 +15,7 @@ jobs:
       - name: Extract Log for Each File
         run: |
           # Find all files (excluding the .git folder) and run git log on each
-          find . -type f -not -path '*/.*' | while read -r file; do
+          find . -type f -name "*.md" -not -path '*/.*' | while read -r file; do
               git log --stat --pretty=format:"__|__$file||%H||%s||%an||%ae||%ar||%ad||%B" -- "$file" >> commit_history.txt
               echo "_/^\_" >> commit_history.txt
           done && [ -s commit_history.txt ] && sed -i '$d' commit_history.txt
