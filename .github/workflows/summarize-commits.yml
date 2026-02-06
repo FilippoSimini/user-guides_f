@@ -20,6 +20,11 @@ jobs:
               echo "_/^\_" >> commit_history.txt
           done && [ -s commit_history.txt ] && sed -i '$d' commit_history.txt
 
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install pandas
+          
       - name: Process with Python
         run: |
           # Set PYTHONPATH to the current directory so imports work correctly
