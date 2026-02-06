@@ -95,5 +95,5 @@ def main(commit_history_path, d='||', s='__|__', file_delim='_/^\_'):
 
 
 if __name__ == '__main__':
-    main()
+    main('commit_history.txt')
 
